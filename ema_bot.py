@@ -5,9 +5,8 @@ import pandas as pd
 TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["CHAT_ID"]
 
-BASE_KLINE_URL = "https://api.binance.com/api/v3/klines"
-BASE_INFO_URL = "https://api.binance.com/api/v3/exchangeInfo"
-
+BASE_KLINE_URL = "https://fapi.binance.com/fapi/v1/klines"
+BASE_INFO_URL = "https://fapi.binance.com/fapi/v1/exchangeInfo"
 
 def get_all_usdt_symbols():
     data = requests.get(BASE_INFO_URL).json()
