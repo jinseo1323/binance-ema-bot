@@ -12,11 +12,9 @@ BASE_INFO_URL = "https://api.binance.com/api/v3/exchangeInfo"
 def get_all_usdt_symbols():
     data = requests.get(BASE_INFO_URL).json()
     symbols = []
-
     for s in data["symbols"]:
         if s["quoteAsset"] == "USDT" and s["status"] == "TRADING":
             symbols.append(s["symbol"])
-
     return symbols
 
 
@@ -57,4 +55,29 @@ def main():
     for symbol in symbols:
         try:
             df = get_klines(symbol)
+
             if df is None or len(df) < 200:
+                continue
+
+            df["ema21"] = df["close"].ewm(span=21).mean()
+            df["ema50"] = df["close"].ewm(span=50).mean()
+            df["ema200"] = df["close"].ewm(span=200).mean()
+
+            last = df.iloc[-1]
+
+            if last["ema21"] > last["ema50"] and last["close"] > last["ema200"]:
+                result.append(symbol)
+
+        except:
+            continue
+
+    if result:
+        message = "📈 4시간봉 조건 충족 코인\n\n" + "\n".join(result)
+    else:
+        message = "조건 충족 코인 없음"
+
+    send_telegram(message)
+
+
+if __name__ == "__main__":
+    main()
