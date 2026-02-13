@@ -30,7 +30,7 @@ def get_klines(symbol):
     response = requests.get(BASE_KLINE_URL, params=params)
     data = response.json()
 
-    if isinstance(data, dict):  # API 에러 방지
+    if isinstance(data, dict):
         return None
 
     df = pd.DataFrame(data)
@@ -43,10 +43,18 @@ def get_klines(symbol):
 
 def send_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    data = {
+    payload = {
         "chat_id": CHAT_ID,
         "text": message
     }
-    requests.post(url
+    requests.post(url, data=payload)
 
 
+def main():
+    symbols = get_all_usdt_symbols()
+    result = []
+
+    for symbol in symbols:
+        try:
+            df = get_klines(symbol)
+            if df is None or len(df) < 200:
